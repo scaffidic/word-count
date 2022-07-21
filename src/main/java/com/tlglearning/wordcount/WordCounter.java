@@ -5,26 +5,39 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public final class WordCounter {
+public class WordCounter {
 
-  private final Map<String, Integer> counts;
+  private final Map<String, Integer> counts = new HashMap<>();
+
+  private int totalWords;
 
 
-  public WordCounter(String text) {
-    String[] words = splitWords(text);
-    counts = Collections.unmodifiableMap(countWords(words));
-  }
-
-  public Set<String> words () {
+  public Set<String> words() {
     return counts.keySet();
   }
 
-  public int getCount (String word) {
+  public int get(String word) {
     return counts.getOrDefault(word, 0);
   }
 
   public Map<String, Integer> getCounts() {
-    return counts;
+    return Collections.unmodifiableMap(counts);
+  }
+
+  public void add(String text) {
+    String trimmedLine = text.trim();
+    if (!trimmedLine.isEmpty()) {
+      String[] words = splitWords(trimmedLine);
+      countWords(words);
+    }
+  }
+
+  public int size() {
+    return counts.size();
+  }
+
+  public int total() {
+    return totalWords;
   }
 
   @Override
@@ -38,19 +51,13 @@ public final class WordCounter {
         .split("[\\W_]+");
   }
 
-  Map<String, Integer> countWords(String[] words) {
-    Map<String, Integer> counts = new HashMap<>();
+  void countWords(String[] words) {
     for (String word : words) {
       //DONE Check if word is already present as a key in count;
       //  if its not present, add it to counts with a value of 1
       //  otherwise, get current value, add 1 to it and update the map with new value
-      if (!counts.containsKey(word)) {
-        counts.put(word, 1);
-      } else {
-        int previousCount = counts.get(word);
-        counts.put(word, previousCount + 1);
-      }
+      counts.put(word, get(word) + 1);
+      totalWords++;
     }
-    return counts;
   }
 }
